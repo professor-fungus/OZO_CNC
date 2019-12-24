@@ -6,9 +6,7 @@
 
 #include <TMCStepper.h>
 
-//#define EN_PIN           38 // Enable, might be handled by LinuxCNC
-//#define DIR_PIN          55 // Direction
-//#define STEP_PIN         54 // Step
+
 #define CS_PIN_1           7 // Chip select
 #define CS_PIN_2           8
 #define CS_PIN_3           9
@@ -36,10 +34,6 @@ TMC5160Stepper driver_3(CS_PIN_3, R_SENSE);
 
 
 void setup() {
-  //pinMode(EN_PIN, OUTPUT);
-  //pinMode(STEP_PIN, OUTPUT);
-  //pinMode(DIR_PIN, OUTPUT);
-  //digitalWrite(EN_PIN, LOW);      // Enable driver in hardware, this may be on parport
   
   pinMode(STATUS_0, INPUT);
   pinMode(STATUS_1, INPUT);
@@ -54,13 +48,13 @@ void setup() {
   pinMode(VACUUM, OUTPUT);
   pinMode(DOOR, OUTPUT);
 
-
+  Serial.begin(9600);
   SPI.begin();                    // SPI drivers
 
   //Drive 1==================================================================================================
   driver_1.begin();                 // SPI: Init CS pins and possible SW SPI pins
 
-  driver_1.toff(5);                 // Enables driver in software
+  //driver_1.toff(5);                 // Enables driver in software
   driver_1.rms_current(600);        // Set motor RMS current
   driver_1.microsteps(16);          // Set microsteps to 1/16th
 
@@ -71,7 +65,7 @@ void setup() {
   //Drive 2==================================================================================================
   driver_2.begin();
 
-  driver_2.toff(5);                 // Enables driver in software
+  //driver_2.toff(5);                 // Enables driver in software
   driver_2.rms_current(600);        // Set motor RMS current
   driver_2.microsteps(16);          // Set microsteps to 1/16th
 
@@ -82,7 +76,7 @@ void setup() {
   //Drive 3==================================================================================================
   driver_3.begin();
 
-  driver_3.toff(5);                 // Enables driver in software
+  //driver_3.toff(5);                 // Enables driver in software
   driver_3.rms_current(600);        // Set motor RMS current
   driver_3.microsteps(16);          // Set microsteps to 1/16th
 
@@ -91,24 +85,15 @@ void setup() {
   driver_3.pwm_autoscale(true);     // Needed for stealthChop
 }
 
-//bool shaft = false;
 
 void loop() {
 
-  if((digitalRead(DR_0_DIAG_0)==LOW) || (digitalRead(DR_0_DIAG_0)==LOW) || (digitalRead(DR_0_DIAG_0)==LOW)) {
+  if((digitalRead(DR_0_DIAG_0)==LOW) || (digitalRead(DR_1_DIAG_0)==LOW) || (digitalRead(DR_2_DIAG_0)==LOW)) {
     digitalWrite(ESTOP, LOW);
+    Serial.println("ESTOP!");
   } else {
     pinMode(ESTOP, INPUT_PULLUP);
+    Serial.println("All Good.");
   }
-  /*
-  // Run 5000 steps and switch direction in software
-  for (uint16_t i = 5000; i>0; i--) {
-    digitalWrite(STEP_PIN, HIGH);
-    delayMicroseconds(160);
-    digitalWrite(STEP_PIN, LOW);
-    delayMicroseconds(160);
-  }
-  shaft = !shaft;
-  driver.shaft(shaft);
-  */
+
 }
